@@ -3,26 +3,32 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Image-Processing",
-  description: "一個陽春的C++影像處理庫",
+  description: "一個輕量的C++影像處理庫",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: "Home", link: "/" },
+      { text: "Docs", link: "/pages/setup" },
+      {
+        text: "Examples",
+        link: "https://github.com/yappy2000d/Image-Processsing/tree/main/example",
+      },
     ],
 
     sidebar: [
+      { text: "快速上手", link: "/pages/setup" },
       {
-        text: 'Examples',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
-        ]
-      }
+          { text: "RGBImage", link: "/pages/RGBImage" },
+          { text: "GrayImage", link: "/pages/GrayImage" },
+          { text: "Matrix", link: "/pages/Matrix" },
+        ],
+      },
     ],
+  },
 
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
-    ]
-  }
-})
+  markdown: {
+    // https://vitepress.dev/reference/markdown
+    math: true,
+  },
+});
