@@ -1,5 +1,5 @@
-#ifndef TOOLS_HPP
-#define TOOLS_HPP
+#ifndef IMGPROCESS_HPP
+#define IMGPROCESS_HPP
 
 #include <vector>
 #include <fstream>
