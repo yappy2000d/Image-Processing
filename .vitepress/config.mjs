@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: "/Image-Processing/",
   title: "Image-Processing",
   description: "一個輕量的C++影像處理庫",
   themeConfig: {
