@@ -21,7 +21,8 @@
 
 + `const char* method`：轉換方法
 
-##### method：["HSI", "YCC"]，預設為"HSI"
+##### method
+["HSI", "YCC"]，預設為"HSI"。
 
 ###### HSI
 
@@ -29,7 +30,7 @@ $$gray=I=\frac{1}{3}(R+G+B)$$
 
 ###### YCC
 
-$$gary=Y=gray=I=0.299\cdot{R}+0.587\cdot{G}+0.114\cdot{B}$$
+$$gary=Y=0.299\cdot{R}+0.587\cdot{G}+0.114\cdot{B}$$
 
 #### 回傳 Return
 
