@@ -128,12 +128,24 @@ struct Matrix : std::vector<std::vector<double>>
         return result;
     }
 
+    Matrix operator-() const {
+        Matrix result(width, height);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                result[y][x] = -(*this)[y][x];
+            }
+        }
+
+        return result;
+    }
+
     Matrix operator-(double scalar) const {
         return *this + (-scalar);
     }
 
     friend Matrix operator-(double scalar, const Matrix& matrix) {
-        return (-scalar) + matrix;
+        return scalar + (-matrix);
     }
 
     Matrix transpose() const {
