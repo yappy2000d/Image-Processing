@@ -51,7 +51,7 @@ struct Matrix : std::vector<std::vector<double>>
     Matrix(int width, int height) : std::vector<std::vector<double>>(height, std::vector<double>(width)), width(width), height(height) {}
 
     Matrix operator*(const Matrix& other) const {
-        if (width != other.height) throw std::runtime_error("Matrix dimensions do not match!");
+        if (width != other.height) throw std::runtime_error("Cannot multiply matrices with incompatible shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
 
         Matrix result(other.width, height);
 
@@ -85,7 +85,7 @@ struct Matrix : std::vector<std::vector<double>>
     }
 
     Matrix operator+(const Matrix& other) const {
-        if (width != other.width || height != other.height) throw std::runtime_error("Matrix dimensions do not match!");
+        if (width != other.width || height != other.height) throw std::runtime_error("Cannot add matrices with different shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
 
         Matrix result(width, height);
 
@@ -115,7 +115,7 @@ struct Matrix : std::vector<std::vector<double>>
     }
 
     Matrix operator-(const Matrix& other) const {
-        if (width != other.width || height != other.height) throw std::runtime_error("Matrix dimensions do not match!");
+        if (width != other.width || height != other.height) throw std::runtime_error("Cannot subtract matrices with different shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
 
         Matrix result(width, height);
 
@@ -166,7 +166,7 @@ struct Matrix : std::vector<std::vector<double>>
 
     // Frobenius inner product
     double dot(const Matrix& other) const {
-        if (width != other.width || height != other.height) throw std::runtime_error("Matrix dimensions do not match!");
+        if (width != other.width || height != other.height) throw std::runtime_error("Cannot calculate dot product of matrices with different shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
 
         double sum = 0;
 
@@ -180,7 +180,7 @@ struct Matrix : std::vector<std::vector<double>>
     }
 
     Matrix submatrix(int y, int x, int h, int w) const {
-        if (y + h > height || x + w > width) throw std::runtime_error("Submatrix out of bounds!");
+        if (y + h > height || x + w > width) throw std::runtime_error("Submatrix out of bounds! Matrix size is " + std::to_string(width) + "x" + std::to_string(height) + ", requested submatrix size is " + std::to_string(w) + "x" + std::to_string(h) + " at position " + std::to_string(x) + "," + std::to_string(y));
 
         Matrix result(w, h);
 
@@ -218,11 +218,11 @@ struct GrayImage : std::vector<std::vector<uint8_t>>
         };
     }
 
-    GrayImage& toFile(const char* filename) {
+    GrayImage& toFile(const std::string& filename) {
 
         std::ofstream file(filename, std::ios::binary);
 
-        if (!file) throw std::runtime_error("Could not open the image file!");
+        if (!file) throw std::runtime_error("Failed to open the file: " + filename);
 
         file.write(reinterpret_cast<char*>(&fileHeader), sizeof(BITMAPFILEHEADER));
         file.write(reinterpret_cast<char*>(&infoHeader), sizeof(BITMAPINFOHEADER));
@@ -294,13 +294,13 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
         };
     }
 
-    static RGBImage fromFile(const char* filename) {
+    static RGBImage fromFile(const std::string& filename) {
         BITMAPFILEHEADER fileHeader;
         BITMAPINFOHEADER infoHeader;
         
         std::ifstream file(filename, std::ios::binary);
         
-        if (!file) throw std::runtime_error("Could not open the image file!");
+        if (!file) throw std::runtime_error("Failed to open the file: " + filename);
 
         file.read(reinterpret_cast<char*>(&fileHeader), sizeof(BITMAPFILEHEADER));
         file.read(reinterpret_cast<char*>(&infoHeader), sizeof(BITMAPINFOHEADER));
@@ -328,12 +328,12 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
         return image;
     }
 
-    RGBImage& toFile(const char* filename) {
+    RGBImage& toFile(const std::string& filename) {
         int paddingSize = (4 - (width * 3 % 4)) % 4;
 
         std::ofstream file(filename, std::ios::binary);
 
-        if (!file) throw std::runtime_error("Could not open the image file!");
+        if (!file) throw std::runtime_error("Failed to open the file: " + filename);
 
         file.write(reinterpret_cast<char*>(&fileHeader), sizeof(BITMAPFILEHEADER));
         file.write(reinterpret_cast<char*>(&infoHeader), sizeof(BITMAPINFOHEADER));
@@ -350,7 +350,7 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
         return *this;
     }
 
-    GrayImage toGrayImage(const char* method="HSI") {
+    GrayImage toGray(const std::string& method="HSI") {
         GrayImage grayImage(width, height);
 
         for (int y = 0; y < height; y++) {
