@@ -10,8 +10,8 @@
 ## 函數 Functions
 
 + `RGBImage(int width, int height)`：建構子
-+ `toGrayImage(const char* method)`：將彩色影像轉換為灰階影像
-+ `toFile(const char* filename)`：將影像儲存至檔案
++ `toGray(const string& method)`：將彩色影像轉換為灰階影像
++ `toFile(const string& filename)`：將影像儲存至檔案
 
 ### toGrayImage
 
@@ -19,7 +19,7 @@
 
 #### 參數 Parameters
 
-+ `const char* method`：轉換方法
++ `const string& method`：轉換方法
 
 ##### method
 ["HSI", "YCC"]，預設為"HSI"。
@@ -36,7 +36,7 @@ $$gary=Y=0.299\cdot{R}+0.587\cdot{G}+0.114\cdot{B}$$
 
 ## 靜態函數 Static Functions
 
-+ `fromFile(const char* filename)`：從檔案建立 RGBImage 物件
++ `fromFile(const string& filename)`：從檔案建立 RGBImage 物件
 
 ### fromFile
 
@@ -49,7 +49,7 @@ $$gary=Y=0.299\cdot{R}+0.587\cdot{G}+0.114\cdot{B}$$
 
 #### 參數 Parameters
 
-+ `const char* filename`：圖片檔案路徑
++ `const string& filename`：圖片檔案路徑
 
 #### 回傳 Return
 
@@ -58,4 +58,17 @@ $$gary=Y=0.299\cdot{R}+0.587\cdot{G}+0.114\cdot{B}$$
 ## 範例 Example
 
 ```cpp
+#include <iostream>
+#include "imgProcess.hpp"
+
+int main() {
+    RGBImage img = RGBImage::fromFile("image.bmp");
+    img.toFile("copy.bmp");
+
+    int x = 0, y = 0;
+    RGBTRIPLE pixel = img[y][x];
+    GrayImage gray = img.toGray("YCC");
+
+    return 0;
+}
 ```
