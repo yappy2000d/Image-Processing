@@ -1,10 +1,10 @@
-<p align="right"><b>[English] / <a href="">[中文]</a></b></p>
+<p align="right"><b>[English] / <a href="README_zh.md">[中文]</a></b></p>
  
 # Image Processing Library
 
-![C++11](https://img.shields.io/badge/C++-std11%20-blue.svg?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
-![Docs](https://img.shields.io/badge/Docs-中文-blue.svg?style=flat-square)
+[![C++11](https://img.shields.io/badge/C++-std11%20-blue.svg?style=flat-square)](#)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Docs](https://img.shields.io/badge/Docs-中文-blue.svg?style=flat-square)](https://yappy2000d.github.io/Image-Processing/)
 
 This library is designed for image processing implementation courses, focusing on simplifying file reading/writing and array operations. This allows students to concentrate on developing image processing algorithms without having to deal with complex image formats.
 
