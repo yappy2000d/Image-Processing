@@ -2,9 +2,9 @@
 
 # Image Processing
 
-![C++11](https://img.shields.io/badge/C++-std11%20-blue.svg?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
-![Docs](https://img.shields.io/badge/Docs-中文-blue.svg?style=flat-square)
+[![C++11](https://img.shields.io/badge/C++-std11%20-blue.svg?style=flat-square)](#)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Docs](https://img.shields.io/badge/Docs-中文-blue.svg?style=flat-square)](https://yappy2000d.github.io/Image-Processing/)
 
 這個庫是為影像處理實作課程而設計的，專注於簡化檔案讀寫與陣列操作，讓學生能夠專注於開發影像處理演算法，而無需處理複雜的影像格式。
 
