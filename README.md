@@ -14,7 +14,7 @@ OpenCV is a powerful image processing library that provides many ready-to-use al
 
 ## Features
 
-- **Lightweight**: This library offers only the most basic functionalities, excluding any complex algorithms.
+- **Lightweight**: This library only provides the most basic functions and does not contain any complex algorithms.
 - **Portability**: This library uses only the standard library, making it compatible with any compiler that supports C++11.
 
 ## Comparison with Windows C++/CLI
