@@ -17,13 +17,24 @@ export default defineConfig({
     ],
 
     sidebar: [
+      { text: "簡介",link: "/pages/intro" },
       { text: "快速上手", link: "/pages/setup" },
       {
+        text: "類別定義",
         items: [
-          { text: "RGBImage", link: "/pages/RGBImage" },
+          {
+            text: "RGBImage",
+            link: "/pages/RGBImage",
+            collapsed: true,
+            items: [{ text: "RGBTRIPLE", link: "/pages/RGBTRIPLE" }],
+          },
           { text: "GrayImage", link: "/pages/GrayImage" },
           { text: "Matrix", link: "/pages/Matrix" },
         ],
+      },
+      {
+        text: "程式範例",
+        link: "https://github.com/yappy2000d/Image-Processsing/tree/main/example",
       },
     ],
   },
