@@ -4,12 +4,12 @@
 
 ## 屬性 Attributes
 
-+ `int width`：影像寬度
 + `int height`：影像高度
++ `int width`：影像寬度
 
 ## 函數 Functions
 
-+ `GrayImage(int width, int height)`：建構子
++ `GrayImage(int height, int width)`：建構子
 + `GrayImage& toFile(const string& filename)`：將影像儲存至檔案
 + `Matrix toMatrix()`：回傳影像矩陣
 

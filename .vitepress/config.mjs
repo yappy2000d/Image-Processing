@@ -18,9 +18,9 @@ export default defineConfig({
 
     sidebar: [
       { text: "簡介",link: "/pages/intro" },
-      { text: "快速上手", link: "/pages/setup" },
+      { text: "開始", link: "/pages/startup" },
       {
-        text: "類別定義",
+        text: "類別",
         items: [
           {
             text: "RGBImage",
@@ -33,7 +33,13 @@ export default defineConfig({
         ],
       },
       {
-        text: "程式範例",
+        text: "函數",
+        items: [
+          { text: "函數", link: "/pages/functions" },
+        ],
+      },
+      {
+        text: "範例",
         link: "https://github.com/yappy2000d/Image-Processsing/tree/main/example",
       },
     ],

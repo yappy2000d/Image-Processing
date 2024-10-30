@@ -4,12 +4,12 @@
 
 ## 屬性 Attributes
 
-+ `int width`：影像寬度
 + `int height`：影像高度
++ `int width`：影像寬度
 
 ## 函數 Functions
 
-+ `RGBImage(int width, int height)`：建構子
++ `RGBImage(int height, int width)`：建構子
 + `GrayImage toGray(const string& method)`：回傳彩色影像的灰階
 + `RGBImage& toFile(const string& filename)`：將影像儲存至檔案
 

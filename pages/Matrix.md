@@ -4,12 +4,12 @@
 
 ## 屬性 Attributes
 
-+ `int width`：矩陣寬度
 + `int height`：矩陣高度
++ `int width`：矩陣寬度
 
 ## 函數 Functions
 
-+ `Matrix(int width, int height)`：建構子
++ `Matrix(int height, int width)`：建構子
 
 ## 運算子 Operators
 
