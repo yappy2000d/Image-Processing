@@ -4,8 +4,13 @@
 #include <vector>
 #include <fstream>
 #include <cstdint>
+#include <string>
 #include <initializer_list>
+#include <array>
 
+constexpr size_t COLOR_TABLE_SIZE = 256;
+
+// Follow the naming convention of wingdi.h
 #pragma pack(push, 1)
 struct RGBTRIPLE {
     uint8_t rgbtBlue;
@@ -88,8 +93,8 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
     GrayImage toGray(const std::string& method);
 };
 
-RGBImage makeRectangle(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color);
-RGBImage makeRectangle(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color);
+RGBImage drawRect(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color);
+RGBImage drawRect(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color);
 
 ///////////////////////////////////////
 //      Matrix implementation        //
@@ -110,7 +115,8 @@ Matrix::Matrix(std::initializer_list<std::initializer_list<double>> list) : std:
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
-    if (width != other.height) throw std::runtime_error("Cannot multiply matrices with incompatible shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
+    if (width != other.height)
+        throw std::runtime_error("Cannot multiply matrices with incompatible shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
 
     Matrix result(height, other.width);
 
@@ -144,7 +150,8 @@ Matrix operator*(double scalar, const Matrix& matrix) {
 }
 
 Matrix Matrix::operator+(const Matrix& other) const {
-    if (width != other.width || height != other.height) throw std::runtime_error("Cannot add matrices with different shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
+    if (width != other.width || height != other.height)
+        throw std::runtime_error("Cannot add matrices with different shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
 
     Matrix result(height, width);
 
@@ -174,7 +181,8 @@ Matrix operator+(double scalar, const Matrix& matrix) {
 }
 
 Matrix Matrix::operator-(const Matrix& other) const {
-    if (width != other.width || height != other.height) throw std::runtime_error("Cannot subtract matrices with different shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
+    if (width != other.width || height != other.height)
+        throw std::runtime_error("Cannot subtract matrices with different shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
 
     Matrix result(height, width);
 
@@ -225,7 +233,8 @@ Matrix Matrix::T() const {
 
 // Frobenius inner product
 double Matrix::dot(const Matrix& other) const {
-    if (width != other.width || height != other.height) throw std::runtime_error("Cannot calculate dot product of matrices with different shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
+    if (width != other.width || height != other.height)
+        throw std::runtime_error("Cannot calculate dot product of matrices with different shapes! Got " + std::to_string(width) + "x" + std::to_string(height) + " and " + std::to_string(other.width) + "x" + std::to_string(other.height));
 
     double sum = 0;
 
@@ -239,7 +248,11 @@ double Matrix::dot(const Matrix& other) const {
 }
 
 Matrix Matrix::submatrix(int y, int x, int h, int w) const {
-    if (y + h > height || x + w > width) throw std::runtime_error("Submatrix out of bounds! Matrix size is " + std::to_string(width) + "x" + std::to_string(height) + ", requested submatrix size is " + std::to_string(w) + "x" + std::to_string(h) + " at position " + std::to_string(x) + "," + std::to_string(y));
+    if (y + h > height || x + w > width)
+        throw std::runtime_error("Submatrix out of bounds! Matrix size is " + std::to_string(width) + "x" + std::to_string(height) + ", requested submatrix size is " + std::to_string(w) + "x" + std::to_string(h) + " at position " + std::to_string(x) + "," + std::to_string(y));
+
+    if (y < 0 || x < 0 || h < 0 || w < 0)
+        throw std::runtime_error("Submatrix size and position must be positive! Got " + std::to_string(w) + "x" + std::to_string(h) + " at position " + std::to_string(x) + "," + std::to_string(y));
 
     Matrix result(h, w);
 
@@ -258,12 +271,14 @@ Matrix Matrix::submatrix(int y, int x, int h, int w) const {
 
 GrayImage::GrayImage(int height, int width) : std::vector<std::vector<uint8_t>>(height, std::vector<uint8_t>(width)), height(height), width(width)
 {
+    // C99 designated initializers, standardized in C++20
     fileHeader = {
         .bfType = 0x4D42,
         .bfSize = static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + height * ((width + 3) & ~3)),
         .bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)
     };
 
+    // C99 designated initializers, standardized in C++20
     infoHeader = {
         .biSize = sizeof(BITMAPINFOHEADER),
         .biWidth = width,
@@ -283,13 +298,19 @@ GrayImage& GrayImage::toFile(const std::string& filename) {
     file.write(reinterpret_cast<char*>(&infoHeader), sizeof(BITMAPINFOHEADER));
     
     // Color table(Mandatory for color depths ≤ 8 bits)
-    for (int i = 0; i < 256; ++i) {
-        uint8_t color[4] = { static_cast<uint8_t>(i), static_cast<uint8_t>(i), static_cast<uint8_t>(i), 0 };
-        file.write(reinterpret_cast<char*>(color), sizeof(color));
+    std::array<uint8_t, COLOR_TABLE_SIZE * 4> colorTable;
+    for (int i = 0; i < COLOR_TABLE_SIZE; ++i) {
+        colorTable[i * 4 + 0] = static_cast<uint8_t>(i); // Blue
+        colorTable[i * 4 + 1] = static_cast<uint8_t>(i); // Green
+        colorTable[i * 4 + 2] = static_cast<uint8_t>(i); // Red
     }
+    file.write(reinterpret_cast<char*>(colorTable.data()), colorTable.size() * sizeof(uint8_t));
+
 
     int padding = (4 - (width % 4)) % 4;
-    for (int y = 0; y < height; ++y) {
+
+    // BMP files are stored bottom-up
+    for (int y = height - 1; y >= 0; --y) {
         file.write(reinterpret_cast<char*>(this->at(y).data()), width);
         uint8_t pad[3] = { 0 };
         file.write(reinterpret_cast<char*>(pad), padding);
@@ -327,12 +348,14 @@ RGBImage::RGBImage(int height, int width) : std::vector<std::vector<RGBTRIPLE>>(
 {
     int paddingSize = (4 - (width * 3 % 4)) % 4;
 
+    // C99 designated initializers, standardized in C++20
     fileHeader = {
         .bfType = 0x4D42,
         .bfSize = static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + height * width * 3 + height * paddingSize),
         .bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)
     };
 
+    // C99 designated initializers, standardized in C++20
     infoHeader = {
         .biSize = sizeof(BITMAPINFOHEADER),
         .biWidth = width,
@@ -367,7 +390,9 @@ RGBImage RGBImage::fromFile(const std::string& filename) {
         for (int x = 0; x < width; x++) {
             RGBTRIPLE pixel;
             file.read(reinterpret_cast<char*>(&pixel), sizeof(RGBTRIPLE));
-            image[y][x] = pixel;
+
+            // BMP files are stored bottom-up
+            image[height - y - 1][x] = pixel;
         }
         file.seekg(paddingSize, std::ios::cur);
     }
@@ -388,7 +413,9 @@ RGBImage& RGBImage::toFile(const std::string& filename) {
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            RGBTRIPLE pixel = (*this)[y][x];
+            
+            // BMP files are stored bottom-up
+            RGBTRIPLE pixel = (*this)[height - y - 1][x];
             file.write(reinterpret_cast<char*>(&pixel), sizeof(RGBTRIPLE));
         }
         file.seekp(paddingSize, std::ios::cur);
@@ -408,7 +435,7 @@ GrayImage RGBImage::toGray(const std::string& method="HSI") {
             if (method == "HSI") {
                 gray = (pixel.rgbtRed + pixel.rgbtGreen + pixel.rgbtBlue) / 3;
             } else if (method == "YCC") {
-                gray = 0.299 * pixel.rgbtRed + 0.587 * pixel.rgbtGreen + 0.114 * pixel.rgbtBlue;
+                gray = static_cast<uint8_t>(0.299 * pixel.rgbtRed + 0.587 * pixel.rgbtGreen + 0.114 * pixel.rgbtBlue);
             } else {
                 throw std::runtime_error("Unknown method! Supported methods are HSI and YCC.");
             }
@@ -423,7 +450,7 @@ GrayImage RGBImage::toGray(const std::string& method="HSI") {
 //      Fuunction implementation      //
 ////////////////////////////////////////
 
-RGBImage makeRectangle(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color) {
+RGBImage drawRect(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color) {
     for (int i = 0; i < w; i++) {
         image[y][x + i] = color;
         image[y + h - 1][x + i] = color;
@@ -435,7 +462,7 @@ RGBImage makeRectangle(RGBImage image, int y, int x, int h, int w, RGBTRIPLE col
     return image;
 }
 
-RGBImage makeRectangle(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color) {
+RGBImage drawRect(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color) {
     RGBImage result(image.height, image.width);
 
     for(int i = 0; i < image.height; i++) {
