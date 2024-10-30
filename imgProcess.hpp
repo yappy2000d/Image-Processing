@@ -274,9 +274,9 @@ GrayImage::GrayImage(int height, int width) noexcept : std::vector<std::vector<u
     // Initializer list
     fileHeader = {
         0x4D42,
-        static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + COLOR_TABLE_SIZE + height * ((width + 3) & ~3)),
+        static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + COLOR_TABLE_SIZE * 4 + height * ((width + 3) & ~3)),
         0, 0,
-        static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + COLOR_TABLE_SIZE),
+        static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + COLOR_TABLE_SIZE * 4),
     };
 
     infoHeader = {
@@ -286,7 +286,7 @@ GrayImage::GrayImage(int height, int width) noexcept : std::vector<std::vector<u
         1,
         8,
         BI_RGB,
-        0, 0,
+        0, 0, 0,
         COLOR_TABLE_SIZE,
         0,
     };
@@ -307,6 +307,7 @@ GrayImage& GrayImage::toFile(const std::string& filename) {
         colorTable[i * 4 + 0] = static_cast<uint8_t>(i); // Blue
         colorTable[i * 4 + 1] = static_cast<uint8_t>(i); // Green
         colorTable[i * 4 + 2] = static_cast<uint8_t>(i); // Red
+        colorTable[i * 4 + 3] = 0;                       // Alpha(Reserved)
     }
     file.write(reinterpret_cast<char*>(colorTable.data()), colorTable.size() * sizeof(uint8_t));
 
