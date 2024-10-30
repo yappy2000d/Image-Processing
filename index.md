@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Read Docs
-      link: /pages/setup
+      link: /pages/startup
     - theme: alt
       text: View Source
       link: https://github.com/yappy2000d/Image-Processsing
