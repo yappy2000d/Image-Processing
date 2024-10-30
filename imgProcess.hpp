@@ -53,20 +53,20 @@ enum Compression {
 struct Matrix : std::vector<std::vector<double>>
 {
     int width, height;
-    Matrix(int height, int width);
+    Matrix(int height, int width) noexcept;
     Matrix(std::initializer_list<std::initializer_list<double>> list);
     Matrix operator*(const Matrix& other) const;
-    Matrix operator*(double scalar) const;
-    friend Matrix operator*(double scalar, const Matrix& matrix);
+    Matrix operator*(double scalar) const noexcept;
+    friend Matrix operator*(double scalar, const Matrix& matrix) noexcept;
     Matrix operator+(const Matrix& other) const;
-    Matrix operator+(double scalar) const;
-    friend Matrix operator+(double scalar, const Matrix& matrix);
+    Matrix operator+(double scalar) const noexcept;
+    friend Matrix operator+(double scalar, const Matrix& matrix) noexcept;
     Matrix operator-(const Matrix& other) const;
-    Matrix operator-() const;
-    Matrix operator-(double scalar) const;
-    friend Matrix operator-(double scalar, const Matrix& matrix);
-    Matrix transpose() const;
-    Matrix T() const;
+    Matrix operator-() const noexcept;
+    Matrix operator-(double scalar) const noexcept;
+    friend Matrix operator-(double scalar, const Matrix& matrix) noexcept;
+    Matrix transpose() const noexcept;
+    Matrix T() const noexcept;
     double dot(const Matrix& other) const;
     Matrix submatrix(int y, int x, int h, int w) const;
 };
@@ -76,10 +76,10 @@ struct GrayImage : std::vector<std::vector<uint8_t>>
     int width, height;
     BITMAPFILEHEADER fileHeader;
     BITMAPINFOHEADER infoHeader;
-    GrayImage(int height, int width);
+    GrayImage(int height, int width) noexcept;
     GrayImage& toFile(const std::string& filename);
-    Matrix toMatrix() const;
-    static GrayImage fromMatrix(const Matrix& matrix);
+    Matrix toMatrix() const noexcept;
+    static GrayImage fromMatrix(const Matrix& matrix) noexcept;
 };
 
 struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
@@ -87,20 +87,20 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
     int width, height;
     BITMAPFILEHEADER fileHeader;
     BITMAPINFOHEADER infoHeader;
-    RGBImage(int height, int width);
+    RGBImage(int height, int width) noexcept;
     static RGBImage fromFile(const std::string& filename);
     RGBImage& toFile(const std::string& filename);
     GrayImage toGray(const std::string& method);
 };
 
-RGBImage drawRect(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color);
-RGBImage drawRect(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color);
+RGBImage drawRect(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color) noexcept;
+RGBImage drawRect(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color) noexcept;
 
 ///////////////////////////////////////
 //      Matrix implementation        //
 ///////////////////////////////////////
 
-Matrix::Matrix(int height, int width) : std::vector<std::vector<double>>(height, std::vector<double>(width)), height(height), width(width) {}
+Matrix::Matrix(int height, int width) noexcept : std::vector<std::vector<double>>(height, std::vector<double>(width)), height(height), width(width) {}
 Matrix::Matrix(std::initializer_list<std::initializer_list<double>> list) : std::vector<std::vector<double>>(list.size(), std::vector<double>(list.begin()->size())), width(list.begin()->size()), height(list.size()) {
     int y = 0;
     for (auto row : list) {
@@ -133,7 +133,7 @@ Matrix Matrix::operator*(const Matrix& other) const {
     return result;
 }
 
-Matrix Matrix::operator*(double scalar) const {
+Matrix Matrix::operator*(double scalar) const noexcept {
     Matrix result(height, width);
 
     for (int y = 0; y < height; y++) {
@@ -145,7 +145,7 @@ Matrix Matrix::operator*(double scalar) const {
     return result;
 }
 
-Matrix operator*(double scalar, const Matrix& matrix) {
+Matrix operator*(double scalar, const Matrix& matrix) noexcept {
     return matrix * scalar;
 }
 
@@ -164,7 +164,7 @@ Matrix Matrix::operator+(const Matrix& other) const {
     return result;
 }
 
-Matrix Matrix::operator+(double scalar) const {
+Matrix Matrix::operator+(double scalar) const noexcept {
     Matrix result(height, width);
 
     for (int y = 0; y < height; y++) {
@@ -176,7 +176,7 @@ Matrix Matrix::operator+(double scalar) const {
     return result;
 }
 
-Matrix operator+(double scalar, const Matrix& matrix) {
+Matrix operator+(double scalar, const Matrix& matrix) noexcept {
     return matrix + scalar;
 }
 
@@ -195,7 +195,7 @@ Matrix Matrix::operator-(const Matrix& other) const {
     return result;
 }
 
-Matrix Matrix::operator-() const {
+Matrix Matrix::operator-() const noexcept {
     Matrix result(height, width);
 
     for (int y = 0; y < height; y++) {
@@ -207,15 +207,15 @@ Matrix Matrix::operator-() const {
     return result;
 }
 
-Matrix Matrix::operator-(double scalar) const {
+Matrix Matrix::operator-(double scalar) const noexcept {
     return *this + (-scalar);
 }
 
-Matrix operator-(double scalar, const Matrix& matrix) {
+Matrix operator-(double scalar, const Matrix& matrix) noexcept {
     return scalar + (-matrix);
 }
 
-Matrix Matrix::transpose() const {
+Matrix Matrix::transpose() const noexcept {
     Matrix result(width, height);
 
     for (int y = 0; y < height; y++) {
@@ -227,7 +227,7 @@ Matrix Matrix::transpose() const {
     return result;
 }
 
-Matrix Matrix::T() const {
+Matrix Matrix::T() const noexcept {
     return transpose();
 }
 
@@ -269,22 +269,26 @@ Matrix Matrix::submatrix(int y, int x, int h, int w) const {
 //      GrayImage implementation      //
 ////////////////////////////////////////
 
-GrayImage::GrayImage(int height, int width) : std::vector<std::vector<uint8_t>>(height, std::vector<uint8_t>(width)), height(height), width(width)
+GrayImage::GrayImage(int height, int width) noexcept : std::vector<std::vector<uint8_t>>(height, std::vector<uint8_t>(width)), height(height), width(width)
 {
-    // C99 designated initializers, standardized in C++20
+    // Initializer list
     fileHeader = {
-        .bfType = 0x4D42,
-        .bfSize = static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + height * ((width + 3) & ~3)),
-        .bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)
+        0x4D42,
+        static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + COLOR_TABLE_SIZE + height * ((width + 3) & ~3)),
+        0, 0,
+        static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + COLOR_TABLE_SIZE),
     };
 
-    // C99 designated initializers, standardized in C++20
     infoHeader = {
-        .biSize = sizeof(BITMAPINFOHEADER),
-        .biWidth = width,
-        .biHeight = height,
-        .biPlanes = 1,
-        .biBitCount = 8,
+        sizeof(BITMAPINFOHEADER),
+        width,
+        height,
+        1,
+        8,
+        BI_RGB,
+        0, 0,
+        COLOR_TABLE_SIZE,
+        0,
     };
 }
 
@@ -312,15 +316,14 @@ GrayImage& GrayImage::toFile(const std::string& filename) {
     // BMP files are stored bottom-up
     for (int y = height - 1; y >= 0; --y) {
         file.write(reinterpret_cast<char*>(this->at(y).data()), width);
-        uint8_t pad[3] = { 0 };
-        file.write(reinterpret_cast<char*>(pad), padding);
+        file.write("\0\0\0", padding);
     }
 
     file.close();
     return *this;
 }
 
-Matrix GrayImage::toMatrix() const {
+Matrix GrayImage::toMatrix() const noexcept {
     Matrix matrix(height, width);
 
     for (int y = 0; y < height; y++) {
@@ -332,7 +335,7 @@ Matrix GrayImage::toMatrix() const {
     return matrix;
 }
 
-GrayImage GrayImage::fromMatrix(const Matrix& matrix) {
+GrayImage GrayImage::fromMatrix(const Matrix& matrix) noexcept {
     GrayImage image(matrix.height, matrix.width);
 
     for (int y = 0; y < matrix.height; y++) {
@@ -344,24 +347,25 @@ GrayImage GrayImage::fromMatrix(const Matrix& matrix) {
     return image;
 }
 
-RGBImage::RGBImage(int height, int width) : std::vector<std::vector<RGBTRIPLE>>(height, std::vector<RGBTRIPLE>(width)), height(height), width(width)
+RGBImage::RGBImage(int height, int width) noexcept : std::vector<std::vector<RGBTRIPLE>>(height, std::vector<RGBTRIPLE>(width)), height(height), width(width)
 {
     int paddingSize = (4 - (width * 3 % 4)) % 4;
 
-    // C99 designated initializers, standardized in C++20
     fileHeader = {
-        .bfType = 0x4D42,
-        .bfSize = static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + height * width * 3 + height * paddingSize),
-        .bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)
+        0x4D42,
+        static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + height * width * 3 + height * paddingSize),
+        0, 0,
+        static_cast<uint32_t>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)),
     };
 
-    // C99 designated initializers, standardized in C++20
     infoHeader = {
-        .biSize = sizeof(BITMAPINFOHEADER),
-        .biWidth = width,
-        .biHeight = height,
-        .biPlanes = 1,
-        .biBitCount = 24,
+        sizeof(BITMAPINFOHEADER),
+        width,
+        height,
+        1,
+        24,
+        BI_RGB,
+        0, 0, 0, 0,
     };
 }
 
@@ -450,7 +454,7 @@ GrayImage RGBImage::toGray(const std::string& method="HSI") {
 //      Fuunction implementation      //
 ////////////////////////////////////////
 
-RGBImage drawRect(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color) {
+RGBImage drawRect(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color) noexcept {
     for (int i = 0; i < w; i++) {
         image[y][x + i] = color;
         image[y + h - 1][x + i] = color;
@@ -462,7 +466,7 @@ RGBImage drawRect(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color) {
     return image;
 }
 
-RGBImage drawRect(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color) {
+RGBImage drawRect(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color) noexcept {
     RGBImage result(image.height, image.width);
 
     for(int i = 0; i < image.height; i++) {
