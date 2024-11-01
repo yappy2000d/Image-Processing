@@ -17,10 +17,10 @@ export default defineConfig({
     ],
 
     sidebar: [
-      { text: "簡介",link: "/pages/intro" },
-      { text: "開始", link: "/pages/startup" },
+      { text: "基本介紹", link: "/pages/intro" },
+      { text: "快速開始", link: "/pages/startup" },
       {
-        text: "類別",
+        text: "主要類別",
         items: [
           {
             text: "RGBImage",
@@ -33,13 +33,19 @@ export default defineConfig({
         ],
       },
       {
-        text: "函數",
+        text: "其他功能",
         items: [
-          { text: "函數", link: "/pages/functions" },
+          {
+            text: "繪製邊框",
+            link: "/pages/OutlineRenderer",
+            items: [
+              { text: "ShapeType", link: "/pages/ShapeType" },
+            ],
+          },
         ],
       },
       {
-        text: "範例",
+        text: "程式範例",
         link: "https://github.com/yappy2000d/Image-Processsing/tree/main/example",
       },
     ],

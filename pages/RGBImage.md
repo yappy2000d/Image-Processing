@@ -9,8 +9,9 @@
 
 ## 函數 Functions
 
++ `RGBImage()`：建構子
 + `RGBImage(int height, int width)`：建構子
-+ `GrayImage toGray(const string& method)`：回傳彩色影像的灰階
++ `GrayImage toGray(const ColorSpace& method)`：回傳彩色影像的灰階
 + `RGBImage& toFile(const string& filename)`：將影像儲存至檔案
 
 ### toGray
@@ -19,10 +20,11 @@
 
 #### 參數 Parameters
 
-+ `const string& method`：轉換方法
++ `const ColorSpace& method`：轉換方法
 
 ##### method
-['HSI', 'YCC']，預設為 HSI。
+- ColorSpace::HSI（預設）
+- ColorSpace::YCC
 
 ###### HSI
 
@@ -93,7 +95,7 @@ int main() {
 
     int x = 0, y = 0;
     RGBTRIPLE pixel = img[y][x];
-    GrayImage gray = img.toGray("YCC");
+    GrayImage gray = img.toGray(ColorSpace::YCC);
 
     return 0;
 }

@@ -10,6 +10,7 @@
 ## 函數 Functions
 
 + `Matrix(int height, int width)`：建構子
++ `Matrix(std::initializer_list<std::initializer_list<double>> list)`：建構子
 
 ## 運算子 Operators
 
@@ -63,11 +64,19 @@ Matrix matrixA = matrixB.T();
 
 ## 範例 Example
     
-    ```cpp
-    #include <auto>
+```cpp
+#include <iostream>
+#include "imgProcess.hpp"
 
-    auto main() {
-        auto auto = auto(auto);
-        return auto;
-    }
-    ```
+int main() {
+    Matrix mat(3, 3);    // 建立 3×3 矩陣
+    Matrix A = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    Matrix B = {{9, 8, 7}, {6, 5, 4}, {3, 2, 1}};
+    Matrix C = A + B;    // 矩陣相加
+    Matrix D = A * B;    // 矩陣相乘
+    Matrix E = A.submatrix(1, 1, 2, 2); // 子矩陣
+    Matrix F = A.T();    // 矩陣轉置
+    double G = A.dot(B); // 內積
+    return 0;
+}
+```
