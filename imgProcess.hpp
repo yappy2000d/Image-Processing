@@ -489,8 +489,10 @@ private:
     RGBImage renderRectangle() {
         for (int y = this->y; y < this->y + height; y++) {
             for (int x = this->x; x < this->x + width; x++) {
-                if (y < 0 || y >= image.height || x < 0 || x >= image.width) throw std::runtime_error("Rectangle out of bounds!");
-                if (y - this->y < thickness || x - this->x < thickness || this->y + height - y < thickness || this->x + width - x < thickness) {
+                if (y < 0 || y >= image.height || x < 0 || x >= image.width) 
+                    throw std::runtime_error("Rectangle out of bounds!");
+
+                if (y - this->y < thickness || x - this->x < thickness || (this->y + height - 1 - y) < thickness || (this->x + width - 1 - x) < thickness) {
                     image[y][x] = color;
                 }
             }
