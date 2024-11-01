@@ -50,6 +50,12 @@ enum Compression {
     BI_PNG,
 };
 
+enum class ColorSpace {
+    RGB,
+    HSI,
+    YCC,
+};
+
 struct Matrix : std::vector<std::vector<double>>
 {
     int width, height;
@@ -76,6 +82,7 @@ struct GrayImage : std::vector<std::vector<uint8_t>>
     int width, height;
     BITMAPFILEHEADER fileHeader;
     BITMAPINFOHEADER infoHeader;
+    GrayImage() noexcept : width(0), height(0) {}
     GrayImage(int height, int width) noexcept;
     GrayImage& toFile(const std::string& filename);
     Matrix toMatrix() const noexcept;
@@ -87,14 +94,12 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
     int width, height;
     BITMAPFILEHEADER fileHeader;
     BITMAPINFOHEADER infoHeader;
+    RGBImage() noexcept : width(0), height(0) {}
     RGBImage(int height, int width) noexcept;
     static RGBImage fromFile(const std::string& filename);
     RGBImage& toFile(const std::string& filename);
-    GrayImage toGray(const std::string& method);
+    GrayImage toGray(const ColorSpace& method);
 };
-
-RGBImage drawRect(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color) noexcept;
-RGBImage drawRect(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color) noexcept;
 
 ///////////////////////////////////////
 //      Matrix implementation        //
@@ -430,63 +435,146 @@ RGBImage& RGBImage::toFile(const std::string& filename) {
     return *this;
 }
 
-GrayImage RGBImage::toGray(const std::string& method="HSI") {
+GrayImage RGBImage::toGray(const ColorSpace& method = ColorSpace::HSI) {
     GrayImage grayImage(height, width);
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            RGBTRIPLE pixel = (*this)[y][x];
-            uint8_t gray = 0;
-            if (method == "HSI") {
-                gray = (pixel.rgbtRed + pixel.rgbtGreen + pixel.rgbtBlue) / 3;
-            } else if (method == "YCC") {
-                gray = static_cast<uint8_t>(0.299 * pixel.rgbtRed + 0.587 * pixel.rgbtGreen + 0.114 * pixel.rgbtBlue);
-            } else {
-                throw std::runtime_error("Unknown method! Supported methods are HSI and YCC.");
+    switch (method) {
+        case ColorSpace::HSI:
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    RGBTRIPLE pixel = (*this)[y][x];
+                    uint8_t gray = (pixel.rgbtRed + pixel.rgbtGreen + pixel.rgbtBlue) / 3;
+                    grayImage[y][x] = gray;
+                }
             }
-            grayImage[y][x] = gray;
-        }
+            break;
+        case ColorSpace::YCC:
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    RGBTRIPLE pixel = (*this)[y][x];
+                    uint8_t gray = static_cast<uint8_t>(0.299 * pixel.rgbtRed + 0.587 * pixel.rgbtGreen + 0.114 * pixel.rgbtBlue);
+                    grayImage[y][x] = gray;
+                }
+            }
+            break;
+        default:
+            throw std::runtime_error("Unknown method! Supported methods are HSI and YCC.");
     }
 
     return grayImage;
 }
 
 ////////////////////////////////////////
-//      Fuunction implementation      //
+//   OutlineRenderer implementation   //
 ////////////////////////////////////////
 
-RGBImage drawRect(RGBImage image, int y, int x, int h, int w, RGBTRIPLE color) noexcept {
-    for (int i = 0; i < w; i++) {
-        image[y][x + i] = color;
-        image[y + h - 1][x + i] = color;
-    }
-    for (int i = 0; i < h; i++) {
-        image[y + i][x] = color;
-        image[y + i][x + w - 1] = color;
-    }
-    return image;
-}
+enum class ShapeType {
+    NONE,
+    CIRCLE,
+    RECTANGLE,
+};
 
-RGBImage drawRect(GrayImage image, int y, int x, int h, int w, RGBTRIPLE color) noexcept {
-    RGBImage result(image.height, image.width);
+class OutlineRenderer {
+private:
+    int y, x;
+    int radius;
+    int height, width;
+    RGBTRIPLE color;
+    int thickness;
+    RGBImage image;
+    ShapeType shape;
 
-    for(int i = 0; i < image.height; i++) {
-        for (int j = 0; j < image.width; j++) {
-            result[i][j] = { image[i][j], image[i][j], image[i][j] };
+    // Render the hollow rectangle
+    // x, y is the top-left corner
+    RGBImage renderRectangle() {
+        for (int y = this->y; y < this->y + height; y++) {
+            for (int x = this->x; x < this->x + width; x++) {
+                if (y < 0 || y >= image.height || x < 0 || x >= image.width) throw std::runtime_error("Rectangle out of bounds!");
+                if (y - this->y < thickness || x - this->x < thickness || this->y + height - y < thickness || this->x + width - x < thickness) {
+                    image[y][x] = color;
+                }
+            }
+        }
+        return image;
+    }
+
+    // Render the hollow circle
+    // x, y is the center
+    RGBImage renderCircle() {
+        for (int y = this->y - radius; y <= this->y + radius; y++) {
+            for (int x = this->x - radius; x <= this->x + radius; x++) {
+                if (y < 0 || y >= image.height || x < 0 || x >= image.width) continue;
+                if ((y - this->y) * (y - this->y) + (x - this->x) * (x - this->x) <= radius * radius) {
+                    image[y][x] = color;
+                }
+            }
+        }
+        return image;
+    }
+
+public:
+    OutlineRenderer() : y(0), x(0), color({ 0, 0, 0 }), thickness(1), shape(ShapeType::NONE) {}
+    OutlineRenderer(RGBImage image) : y(0), x(0), color({ 0, 0, 0 }), thickness(1), image(image) {}
+    OutlineRenderer(GrayImage image) : y(0), x(0), color({ 0, 0, 0 }), thickness(1) {
+        this->setImage(image);
+    }
+
+    OutlineRenderer& setPos(int y, int x) {
+        this->y = y;
+        this->x = x;
+        return *this;
+    }
+
+    OutlineRenderer& setColor(RGBTRIPLE color) {
+        this->color = color;
+        return *this;
+    }
+
+    OutlineRenderer& setThickness(int thickness) {
+        this->thickness = thickness;
+        return *this;
+    }
+
+    OutlineRenderer& setImage(RGBImage image) {
+        this->image = image;
+        return *this;
+    }
+
+    OutlineRenderer& setImage(GrayImage image) {
+        for(int i = 0; i < image.height; i++) {
+            for (int j = 0; j < image.width; j++) {
+                this->image[i][j] = { image[i][j], image[i][j], image[i][j] };
+            }
+        }
+        return *this;
+    }
+
+    OutlineRenderer& setShape(ShapeType shape) {
+        this->shape = shape;
+        return *this;
+    }
+
+    OutlineRenderer& setDimensions(int height, int width) {
+        this->height = height;
+        this->width = width;
+        return *this;
+    }
+
+    OutlineRenderer& setRadius(int radius) {
+        this->radius = radius;
+        return *this;
+    }
+
+    RGBImage render() {
+        switch (shape) {
+            case ShapeType::RECTANGLE:
+                return renderRectangle();
+            case ShapeType::CIRCLE:
+                return renderCircle();
+            default:
+                throw std::runtime_error("Unknown shape type!");
         }
     }
-
-    for(int i = 0; i < w; i++) {
-        result[y][x + i] = color;
-        result[y + h - 1][x + i] = color;
-    }
-
-    for(int i = 0; i < h; i++) {
-        result[y + i][x] = color;
-        result[y + i][x + w - 1] = color;
-    }
-
-    return result;
-}
+};
 
 #endif
