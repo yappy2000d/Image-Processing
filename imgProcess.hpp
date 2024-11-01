@@ -487,11 +487,13 @@ private:
     // Render the hollow rectangle
     // x, y is the top-left corner
     RGBImage renderRectangle() {
+        if (height <= 0 || width <= 0) throw std::runtime_error("Rectangle dimensions must greater than 0!");
+        if (thickness <= 0) throw std::runtime_error("Thickness must be greater than 0!");
+        if (thickness >= height || thickness >= width) throw std::runtime_error("Thickness must be less than the height and width!");
+        if (this->y + height > image.height || this->x + width > image.width) throw std::runtime_error("Rectangle out of bounds!");
+
         for (int y = this->y; y < this->y + height; y++) {
             for (int x = this->x; x < this->x + width; x++) {
-                if (y < 0 || y >= image.height || x < 0 || x >= image.width) 
-                    throw std::runtime_error("Rectangle out of bounds!");
-
                 if (y - this->y < thickness || x - this->x < thickness || (this->y + height - 1 - y) < thickness || (this->x + width - 1 - x) < thickness) {
                     image[y][x] = color;
                 }
@@ -515,34 +517,34 @@ private:
     }
 
 public:
-    OutlineRenderer() : y(0), x(0), color({ 0, 0, 0 }), thickness(1), shape(ShapeType::NONE) {}
-    OutlineRenderer(RGBImage image) : y(0), x(0), color({ 0, 0, 0 }), thickness(1), image(image) {}
-    OutlineRenderer(GrayImage image) : y(0), x(0), color({ 0, 0, 0 }), thickness(1) {
+    OutlineRenderer() noexcept : y(0), x(0), color({ 0, 0, 0 }), thickness(1), shape(ShapeType::NONE) {}
+    OutlineRenderer(const RGBImage& image) noexcept : y(0), x(0), color({ 0, 0, 0 }), thickness(1), image(image) {}
+    OutlineRenderer(const GrayImage& image) noexcept : y(0), x(0), color({ 0, 0, 0 }), thickness(1) {
         this->setImage(image);
     }
 
-    OutlineRenderer& setPos(int y, int x) {
+    OutlineRenderer& setPos(int y, int x) noexcept {
         this->y = y;
         this->x = x;
         return *this;
     }
 
-    OutlineRenderer& setColor(RGBTRIPLE color) {
+    OutlineRenderer& setColor(const RGBTRIPLE& color) noexcept {
         this->color = color;
         return *this;
     }
 
-    OutlineRenderer& setThickness(int thickness) {
+    OutlineRenderer& setThickness(int thickness) noexcept {
         this->thickness = thickness;
         return *this;
     }
 
-    OutlineRenderer& setImage(RGBImage image) {
+    OutlineRenderer& setImage(const RGBImage& image) noexcept {
         this->image = image;
         return *this;
     }
 
-    OutlineRenderer& setImage(GrayImage image) {
+    OutlineRenderer& setImage(const GrayImage& image) noexcept {
         for(int i = 0; i < image.height; i++) {
             for (int j = 0; j < image.width; j++) {
                 this->image[i][j] = { image[i][j], image[i][j], image[i][j] };
@@ -551,18 +553,18 @@ public:
         return *this;
     }
 
-    OutlineRenderer& setShape(ShapeType shape) {
+    OutlineRenderer& setShape(const ShapeType& shape) noexcept {
         this->shape = shape;
         return *this;
     }
 
-    OutlineRenderer& setDimensions(int height, int width) {
+    OutlineRenderer& setDimensions(int height, int width) noexcept {
         this->height = height;
         this->width = width;
         return *this;
     }
 
-    OutlineRenderer& setRadius(int radius) {
+    OutlineRenderer& setRadius(int radius) noexcept {
         this->radius = radius;
         return *this;
     }
