@@ -38,6 +38,7 @@ export default defineConfig({
           {
             text: "繪製邊框",
             link: "/pages/OutlineRenderer",
+            collapsed: true,
             items: [
               { text: "ShapeType", link: "/pages/ShapeType" },
             ],
