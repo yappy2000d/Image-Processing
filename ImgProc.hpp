@@ -209,9 +209,9 @@ Matrix Matrix::operator-(const Matrix& other) const {
 Matrix Matrix::operator-() const noexcept {
     Matrix result(height, width);
 
-    for (const auto& row : vec) {
-        for (const auto& elem : row) {
-           elem = -elem;
+    for(int y = 0; y < height; y++) {
+        for(int x = 0; x < width; x++) {
+            result[y][x] = -(*this)[y][x];
         }
     }
 
