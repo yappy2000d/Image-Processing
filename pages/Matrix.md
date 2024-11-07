@@ -27,6 +27,8 @@
 + `Matrix& operator+= (double scalar) noexcept`
 + `Matrix& operator-= (double scalar) noexcept`
 + `Matrix& operator*= (double scalar) noexcept`
++ `bool operator== (const Matrix& other) const`：比較矩陣相等
++ `bool operator!= (const Matrix& other) const`：比較矩陣不等
 + `Matrix transpose() const`：矩陣轉置
 + ~~`Matrix inverse() const`~~：矩陣求逆
 + `double dot(const Matrix& other) const`：矩陣內積
