@@ -71,6 +71,12 @@ struct Matrix : std::vector<std::vector<double>>
     Matrix operator-() const noexcept;
     Matrix operator-(double scalar) const noexcept;
     friend Matrix operator-(double scalar, const Matrix& matrix) noexcept;
+    Matrix operator*= (const Matrix& other);
+    Matrix operator*= (double scalar) noexcept;
+    Matrix operator+= (const Matrix& other);
+    Matrix operator+= (double scalar) noexcept;
+    Matrix operator-= (const Matrix& other);
+    Matrix operator-= (double scalar) noexcept;
     Matrix transpose() const noexcept;
     Matrix T() const noexcept;
     double dot(const Matrix& other) const;
@@ -218,6 +224,30 @@ Matrix Matrix::operator-(double scalar) const noexcept {
 
 Matrix operator-(double scalar, const Matrix& matrix) noexcept {
     return scalar + (-matrix);
+}
+
+Matrix Matrix::operator*=(const Matrix& other) {
+    return *this = *this * other;
+}
+
+Matrix Matrix::operator*=(double scalar) noexcept {
+    return *this = *this * scalar;
+}
+
+Matrix Matrix::operator+=(const Matrix& other) {
+    return *this = *this + other;
+}
+
+Matrix Matrix::operator+=(double scalar) noexcept {
+    return *this = *this + scalar;
+}
+
+Matrix Matrix::operator-=(const Matrix& other) {
+    return *this = *this - other;
+}
+
+Matrix Matrix::operator-=(double scalar) noexcept {
+    return *this = *this - scalar;
 }
 
 Matrix Matrix::transpose() const noexcept {
