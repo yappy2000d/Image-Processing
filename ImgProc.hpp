@@ -67,22 +67,22 @@ struct Matrix : std::vector<std::vector<double>>
     int width, height;
     Matrix(int height, int width) noexcept;
     Matrix(std::initializer_list<std::initializer_list<double>> list);
-    Matrix operator*(const Matrix& other) const;
-    Matrix operator*(double scalar) const noexcept;
-    friend Matrix operator*(double scalar, const Matrix& matrix) noexcept;
+    Matrix operator-() const noexcept;          // Component-wise negation
     Matrix operator+(const Matrix& other) const;
-    Matrix operator+(double scalar) const noexcept;
-    friend Matrix operator+(double scalar, const Matrix& matrix) noexcept;
     Matrix operator-(const Matrix& other) const;
-    Matrix operator-() const noexcept;
+    Matrix operator*(const Matrix& other) const;
+    Matrix operator+(double scalar) const noexcept;
     Matrix operator-(double scalar) const noexcept;
+    Matrix operator*(double scalar) const noexcept;
+    friend Matrix operator+(double scalar, const Matrix& matrix) noexcept;
     friend Matrix operator-(double scalar, const Matrix& matrix) noexcept;
-    Matrix& operator*= (const Matrix& other);
-    Matrix& operator*= (double scalar) noexcept;
+    friend Matrix operator*(double scalar, const Matrix& matrix) noexcept;
     Matrix& operator+= (const Matrix& other);
-    Matrix& operator+= (double scalar) noexcept;
     Matrix& operator-= (const Matrix& other);
+    Matrix& operator*= (const Matrix& other);
+    Matrix& operator+= (double scalar) noexcept;
     Matrix& operator-= (double scalar) noexcept;
+    Matrix& operator*= (double scalar) noexcept;
     Matrix transpose() const noexcept;
     Matrix T() const noexcept;
     double dot(const Matrix& other) const;
@@ -112,7 +112,7 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
     static RGBImage fromFile(const std::string& filename);
     RGBImage& toFile(const std::string& filename);
     GrayImage toGray(const ColorSpace& method);
-    static RGBImage fromGrays(const GrayImage& bChannel, const GrayImage& gChannel, const GrayImage& rChannel);
+    static RGBImage fromGrays(const GrayImage& bChannel, const GrayImage& gChannel, const GrayImage& rChannel) noexcept;
 };
 
 ///////////////////////////////////////
@@ -534,7 +534,7 @@ GrayImage RGBImage::toGray(const ColorSpace& method = ColorSpace::HSI) {
     return grayImage;
 }
 
-RGBImage RGBImage::fromGrays(const GrayImage& bChannel, const GrayImage& gChannel, const GrayImage& rChannel) {
+RGBImage RGBImage::fromGrays(const GrayImage& bChannel, const GrayImage& gChannel, const GrayImage& rChannel) noexcept {
     RGBImage image(bChannel.height, bChannel.width);
 
     for (int y = 0; y < bChannel.height; y++) {
