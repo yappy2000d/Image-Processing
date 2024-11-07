@@ -84,6 +84,8 @@ struct Matrix : std::vector<std::vector<double>>
     Matrix& operator+= (double scalar) noexcept;
     Matrix& operator-= (double scalar) noexcept;
     Matrix& operator*= (double scalar) noexcept;
+    bool operator==(const Matrix& other) const noexcept;
+    bool operator!=(const Matrix& other) const noexcept;
     Matrix transpose() const noexcept;
     Matrix T() const noexcept;
     double dot(const Matrix& other) const;
@@ -248,6 +250,22 @@ Matrix& Matrix::operator-=(const Matrix& other) {
 
 Matrix& Matrix::operator-=(double scalar) noexcept {
     return *this = *this - scalar;
+}
+
+bool Matrix::operator==(const Matrix& other) const noexcept {
+    if (width != other.width || height != other.height) return false;
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            if ((*this)[y][x] != other[y][x]) return false;
+        }
+    }
+
+    return true;
+}
+
+bool Matrix::operator!=(const Matrix& other) const noexcept {
+    return !(*this == other);
 }
 
 Matrix Matrix::transpose() const noexcept {
