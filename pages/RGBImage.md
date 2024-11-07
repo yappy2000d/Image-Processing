@@ -10,9 +10,10 @@
 ## 函數 Functions
 
 + `RGBImage()`：建構子
-+ `RGBImage(int height, int width)`：建構子
++ `RGBImage(int height, int width) noexcept`：建構子
 + `GrayImage toGray(const ColorSpace& method)`：回傳彩色影像的灰階
 + `RGBImage& toFile(const string& filename)`：將影像儲存至檔案
++ `GrayImage getChannel(const Channel& channel) const`：取得指定通道的灰階影像
 
 ### toGray
 
@@ -65,6 +66,7 @@ $$gary=Y=0.299\cdot{R}+0.587\cdot{G}+0.114\cdot{B}$$
 ## 靜態函數 Static Functions
 
 + `static RGBImage fromFile(const string& filename)`：從檔案建立 RGBImage 物件
++ `static RGBImage fromGrays(const GrayImage& bChannel, const GrayImage& gChannel, const GrayImage& rChannel) noexcept`：從三個灰階影像建立 RGBImage 物件
 
 ### fromFile
 
@@ -87,7 +89,7 @@ $$gary=Y=0.299\cdot{R}+0.587\cdot{G}+0.114\cdot{B}$$
 
 ```cpp
 #include <iostream>
-#include "imgProcess.hpp"
+#include "ImgProc.hpp"
 
 int main() {
     RGBImage img = RGBImage::fromFile("image.bmp");

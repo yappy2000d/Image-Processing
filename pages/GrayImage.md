@@ -46,7 +46,7 @@
 
 ```cpp
 #include <iostream>
-#include "imgProcess.hpp"
+#include "ImgProc.hpp"
 
 int main() {
     GrayImage img = RGBImage::fromFile("image.bmp").toGray();

@@ -17,14 +17,27 @@
 + `Matrix operator+(const Matrix& other) const`：矩陣相加
 + `Matrix operator-(const Matrix& other) const`：矩陣相減
 + `Matrix operator*(const Matrix& other) const`：矩陣相乘
-+ `Matrix operator+(double scalar) const`：矩陣加上常數
-+ `Matrix operator-(double scalar) const`：矩陣減去常數
-+ `Matrix operator*(double scalar) const`：矩陣乘以常數
++ `Matrix operator+(double scalar) const noexcept`：矩陣加上常數
++ `Matrix operator-(double scalar) const noexcept`：矩陣減去常數
++ `Matrix operator*(double scalar) const noexcept`：矩陣乘以常數
 + `Matrix operator-() const`：矩陣取負
++ `Matrix& operator+= (const Matrix& other)`
++ `Matrix& operator-= (const Matrix& other)`
++ `Matrix& operator*= (const Matrix& other)`
++ `Matrix& operator+= (double scalar) noexcept`
++ `Matrix& operator-= (double scalar) noexcept`
++ `Matrix& operator*= (double scalar) noexcept`
 + `Matrix transpose() const`：矩陣轉置
 + ~~`Matrix inverse() const`~~：矩陣求逆
 + `double dot(const Matrix& other) const`：矩陣內積
 + `Matrix submatrix(int y, int x, int h, int w) const`：取子矩陣
+
+### operator+=、-= 與 *=
+
+:::info
+雖然可以達到 fluent interface 的效果，但是這樣會造成 side effect。  
+由於其他函數都是 zero side effect，為避免混淆，因此不建議使用。
+:::
 
 ### transpose
 
@@ -66,7 +79,7 @@ Matrix matrixA = matrixB.T();
     
 ```cpp
 #include <iostream>
-#include "imgProcess.hpp"
+#include "ImgProc.hpp"
 
 int main() {
     Matrix mat(3, 3);    // 建立 3×3 矩陣

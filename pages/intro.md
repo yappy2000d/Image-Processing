@@ -24,10 +24,10 @@ OpenCV 是一個功能強大的影像處理庫，提供了許多現成的影像�
 
 ## 設計語彙
 
-+ Method Chaining
-+ Fluent Interface
-+ Zero Side Effect
-+ Minimal Functionality
+1. Method Chaining
+2. Fluent Interface
+3. Zero Side Effect
+4. Minimal Functionality
 
 ### 參數順序
 
@@ -36,3 +36,13 @@ OpenCV 是一個功能強大的影像處理庫，提供了許多現成的影像�
 ### Matrix 的資料類別
 
 為方便使用，目前都使用 `double`，若之後有需要用到其他資料類別，再改為泛型。
+
+### 圖片的通道順序
+
+統一使用BGR的順序。
+
+### 類型轉換
+
++ Matrix 無法轉換。
++ GrayImage 可以 toMatrix 和 fromMatrix。
++ RGBImage 可以 toGray 與 fromGrays（需傳入BGR共3個GrayImage）。

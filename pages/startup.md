@@ -2,12 +2,12 @@
 
 ## 下載
 
-到 [GitHub](https://github.com/yappy2000d/Image-Processsing/blob/main/imgProcess.hpp) 下載 **imgProcess.hpp**，然後將其放入你的專案中。
+到 [GitHub](https://github.com/yappy2000d/Image-Processsing/blob/main/ImgProc.hpp) 下載 **ImgProc.hpp**，然後將其放入你的專案中。
 
 ## 使用
 
 ```cpp
-#include "ImgProcess.hpp"
+#include "ImgProc.hpp"
 
 int main() {
     RGBImage img = RGBImage::fromFile("path/to/image.bmp");
