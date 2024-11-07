@@ -56,6 +56,12 @@ enum class ColorSpace {
     YCC,
 };
 
+enum class Channel {
+    BLUE,
+    GREEN,
+    RED,
+};
+
 struct Matrix : std::vector<std::vector<double>>
 {
     int width, height;
@@ -102,9 +108,11 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
     BITMAPINFOHEADER infoHeader;
     RGBImage() noexcept : width(0), height(0) {}
     RGBImage(int height, int width) noexcept;
+    GrayImage getChannel(const Channel& channel) const;
     static RGBImage fromFile(const std::string& filename);
     RGBImage& toFile(const std::string& filename);
     GrayImage toGray(const ColorSpace& method);
+    static RGBImage fromGrays(const GrayImage& bChannel, const GrayImage& gChannel, const GrayImage& rChannel);
 };
 
 ///////////////////////////////////////
@@ -405,6 +413,38 @@ RGBImage::RGBImage(int height, int width) noexcept : std::vector<std::vector<RGB
     };
 }
 
+GrayImage RGBImage::getChannel(const Channel& channel) const {
+    GrayImage image(height, width);
+
+    switch (channel) {
+        case Channel::BLUE:
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    image[y][x] = (*this)[y][x].rgbtBlue;
+                }
+            }
+            break;
+        case Channel::GREEN:
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    image[y][x] = (*this)[y][x].rgbtGreen;
+                }
+            }
+            break;
+        case Channel::RED:
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    image[y][x] = (*this)[y][x].rgbtRed;
+                }
+            }
+            break;
+        default:
+            throw std::runtime_error("Unknown channel!");
+    }
+
+    return image;
+}
+
 RGBImage RGBImage::fromFile(const std::string& filename) {
     BITMAPFILEHEADER fileHeader;
     BITMAPINFOHEADER infoHeader;
@@ -494,6 +534,18 @@ GrayImage RGBImage::toGray(const ColorSpace& method = ColorSpace::HSI) {
     return grayImage;
 }
 
+RGBImage RGBImage::fromGrays(const GrayImage& bChannel, const GrayImage& gChannel, const GrayImage& rChannel) {
+    RGBImage image(bChannel.height, bChannel.width);
+
+    for (int y = 0; y < bChannel.height; y++) {
+        for (int x = 0; x < bChannel.width; x++) {
+            image[y][x] = { bChannel[y][x], gChannel[y][x], rChannel[y][x] };
+        }
+    }
+
+    return image;
+}
+
 ////////////////////////////////////////
 //   OutlineRenderer implementation   //
 ////////////////////////////////////////
@@ -575,12 +627,13 @@ public:
     }
 
     OutlineRenderer& setImage(const GrayImage& image) noexcept {
-        for(int i = 0; i < image.height; i++) {
-            for (int j = 0; j < image.width; j++) {
-                this->image[i][j] = { image[i][j], image[i][j], image[i][j] };
-            }
-        }
-        return *this;
+        // for(int i = 0; i < image.height; i++) {
+        //     for (int j = 0; j < image.width; j++) {
+        //         this->image[i][j] = { image[i][j], image[i][j], image[i][j] };
+        //     }
+        // }
+        // return *this;
+        return setImage(RGBImage::fromGrays(image, image, image));
     }
 
     OutlineRenderer& setShape(const ShapeType& shape) noexcept {
