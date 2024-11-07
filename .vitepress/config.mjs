@@ -26,7 +26,10 @@ export default defineConfig({
             text: "RGBImage",
             link: "/pages/RGBImage",
             collapsed: true,
-            items: [{ text: "RGBTRIPLE", link: "/pages/RGBTRIPLE" }],
+            items: [
+              { text: "RGBTRIPLE", link: "/pages/RGBTRIPLE" },
+              { text: "Channel", link: "/pages/Channel" },
+            ],
           },
           { text: "GrayImage", link: "/pages/GrayImage" },
           { text: "Matrix", link: "/pages/Matrix" },

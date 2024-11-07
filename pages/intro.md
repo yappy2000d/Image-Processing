@@ -29,6 +29,10 @@ OpenCV 是一個功能強大的影像處理庫，提供了許多現成的影像�
 3. Zero Side Effect
 4. Minimal Functionality
 
+### 變數命名
+
+`RGBTRIPLE`、`BITMAPFILEHEADER`、`BITMAPINFOHEADER`是遵循Windows API的命名方式。
+
 ### 參數順序
 
 為了讓函數的操作與存取2D vector的方式更為一致，函數的參數順序為 `(y, x)` 與 `(height, width)`。
