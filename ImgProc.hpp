@@ -7,6 +7,7 @@
 #include <string>
 #include <initializer_list>
 #include <array>
+#include <algorithm>
 
 constexpr size_t COLOR_TABLE_SIZE = 256;
 
@@ -121,16 +122,7 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
 
 Matrix::Matrix(int height, int width) noexcept : std::vector<std::vector<double>>(height, std::vector<double>(width)), height(height), width(width) {}
 Matrix::Matrix(std::initializer_list<std::initializer_list<double>> list) : std::vector<std::vector<double>>(list.size(), std::vector<double>(list.begin()->size())), width(list.begin()->size()), height(list.size()) {
-    int y = 0;
-    for (auto row : list) {
-        if (row.size() != width) throw std::runtime_error("All rows must have the same length!");
-        int x = 0;
-        for (auto value : row) {
-            (*this)[y][x] = value;
-            x++;
-        }
-        y++;
-    }
+    std::copy(list.begin(), list.end(), begin());
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
@@ -217,9 +209,9 @@ Matrix Matrix::operator-(const Matrix& other) const {
 Matrix Matrix::operator-() const noexcept {
     Matrix result(height, width);
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            result[y][x] = -(*this)[y][x];
+    for (const auto& row : vec) {
+        for (const auto& elem : row) {
+           elem = -elem;
         }
     }
 
@@ -346,11 +338,10 @@ GrayImage& GrayImage::toFile(const std::string& filename) {
     
     // Color table(Mandatory for color depths ≤ 8 bits)
     std::array<uint8_t, COLOR_TABLE_SIZE * 4> colorTable;
-    for (int i = 0; i < COLOR_TABLE_SIZE; ++i) {
-        colorTable[i * 4 + 0] = static_cast<uint8_t>(i); // Blue
-        colorTable[i * 4 + 1] = static_cast<uint8_t>(i); // Green
-        colorTable[i * 4 + 2] = static_cast<uint8_t>(i); // Red
-        colorTable[i * 4 + 3] = 0;                       // Alpha(Reserved)
+    for (uint8_t i = 0; i < COLOR_TABLE_SIZE; i++) {
+        uint8_t* color = colorTable.data() + i * 4;
+        color[0] = color[1] = color[2] = i; // BGR channels
+        color[3] = 0;                       // Alpha channel
     }
     file.write(reinterpret_cast<char*>(colorTable.data()), colorTable.size() * sizeof(uint8_t));
 
