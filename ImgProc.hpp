@@ -356,7 +356,7 @@ GrayImage& GrayImage::toFile(const std::string& filename) {
     
     // Color table(Mandatory for color depths ≤ 8 bits)
     std::array<uint8_t, COLOR_TABLE_SIZE * 4> colorTable;
-    for (uint8_t i = 0; i < COLOR_TABLE_SIZE; i++) {
+    for (uint16_t i = 0; i < COLOR_TABLE_SIZE; i++) {
         uint8_t* color = colorTable.data() + i * 4;
         color[0] = color[1] = color[2] = i; // BGR channels
         color[3] = 0;                       // Alpha channel
