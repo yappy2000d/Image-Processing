@@ -8,6 +8,8 @@
 #include <initializer_list>
 #include <array>
 #include <algorithm>
+#include <filesystem>
+#include <tuple>
 
 constexpr size_t COLOR_TABLE_SIZE = 256;
 
@@ -111,7 +113,8 @@ struct RGBImage : std::vector<std::vector<RGBTRIPLE>>
     BITMAPINFOHEADER infoHeader;
     RGBImage() noexcept : width(0), height(0) {}
     RGBImage(int height, int width) noexcept;
-    GrayImage getChannel(const Channel& channel) const;
+    // GrayImage getChannel(const Channel& channel) const;
+    std::tuple<GrayImage, GrayImage, GrayImage> getChannels() const noexcept;
     static RGBImage fromFile(const std::string& filename);
     RGBImage& toFile(const std::string& filename);
     GrayImage toGray(const ColorSpace& method);
@@ -347,6 +350,12 @@ GrayImage::GrayImage(int height, int width) noexcept : std::vector<std::vector<u
 
 GrayImage& GrayImage::toFile(const std::string& filename) {
 
+    namespace fs = std::filesystem;
+
+    if(!fs::exists(fs::path(filename).parent_path())) {
+        fs::create_directories(fs::path(filename).parent_path());
+    }
+
     std::ofstream file(filename, std::ios::binary);
 
     if (!file) throw std::runtime_error("Failed to open the file: " + filename);
@@ -422,37 +431,21 @@ RGBImage::RGBImage(int height, int width) noexcept : std::vector<std::vector<RGB
     };
 }
 
-GrayImage RGBImage::getChannel(const Channel& channel) const {
-    GrayImage image(height, width);
+std::tuple<GrayImage, GrayImage, GrayImage> RGBImage::getChannels() const noexcept {
+        GrayImage bChannel(height, width);
+        GrayImage gChannel(height, width);
+        GrayImage rChannel(height, width);
 
-    switch (channel) {
-        case Channel::BLUE:
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    image[y][x] = (*this)[y][x].rgbtBlue;
-                }
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                bChannel[y][x] = (*this)[y][x].rgbtBlue;
+                gChannel[y][x] = (*this)[y][x].rgbtGreen;
+                rChannel[y][x] = (*this)[y][x].rgbtRed;
             }
-            break;
-        case Channel::GREEN:
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    image[y][x] = (*this)[y][x].rgbtGreen;
-                }
-            }
-            break;
-        case Channel::RED:
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    image[y][x] = (*this)[y][x].rgbtRed;
-                }
-            }
-            break;
-        default:
-            throw std::runtime_error("Unknown channel!");
+        }
+
+        return { bChannel, gChannel, rChannel };
     }
-
-    return image;
-}
 
 RGBImage RGBImage::fromFile(const std::string& filename) {
     BITMAPFILEHEADER fileHeader;
@@ -491,7 +484,11 @@ RGBImage RGBImage::fromFile(const std::string& filename) {
 }
 
 RGBImage& RGBImage::toFile(const std::string& filename) {
-    int paddingSize = (4 - (width * 3 % 4)) % 4;
+    namespace fs = std::filesystem;
+
+    if(!fs::exists(fs::path(filename).parent_path())) {
+        fs::create_directories(fs::path(filename).parent_path());
+    }
 
     std::ofstream file(filename, std::ios::binary);
 
@@ -499,6 +496,8 @@ RGBImage& RGBImage::toFile(const std::string& filename) {
 
     file.write(reinterpret_cast<char*>(&fileHeader), sizeof(BITMAPFILEHEADER));
     file.write(reinterpret_cast<char*>(&infoHeader), sizeof(BITMAPINFOHEADER));
+
+    int paddingSize = (4 - (width * 3 % 4)) % 4;
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
