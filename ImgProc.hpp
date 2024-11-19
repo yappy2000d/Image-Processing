@@ -433,20 +433,20 @@ RGBImage::RGBImage(int height, int width) noexcept : std::vector<std::vector<RGB
 }
 
 std::tuple<GrayImage, GrayImage, GrayImage> RGBImage::getChannels() const noexcept {
-        GrayImage bChannel(height, width);
-        GrayImage gChannel(height, width);
-        GrayImage rChannel(height, width);
+    GrayImage bChannel(height, width);
+    GrayImage gChannel(height, width);
+    GrayImage rChannel(height, width);
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                bChannel[y][x] = (*this)[y][x].rgbtBlue;
-                gChannel[y][x] = (*this)[y][x].rgbtGreen;
-                rChannel[y][x] = (*this)[y][x].rgbtRed;
-            }
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            bChannel[y][x] = (*this)[y][x].rgbtBlue;
+            gChannel[y][x] = (*this)[y][x].rgbtGreen;
+            rChannel[y][x] = (*this)[y][x].rgbtRed;
         }
-
-        return { bChannel, gChannel, rChannel };
     }
+
+    return { bChannel, gChannel, rChannel };
+}
 
 RGBImage RGBImage::fromFile(const std::string& filename) {
     BITMAPFILEHEADER fileHeader;
