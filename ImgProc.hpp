@@ -10,8 +10,9 @@
 #include <algorithm>
 #include <filesystem>
 #include <tuple>
+#include <cstddef>
 
-constexpr size_t COLOR_TABLE_SIZE = 256;
+constexpr std::size_t COLOR_TABLE_SIZE = 256;
 
 // Follow the naming convention of wingdi.h
 #pragma pack(push, 1)
