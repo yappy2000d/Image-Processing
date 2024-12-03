@@ -396,7 +396,7 @@ GrayImage GrayImage::fromMatrix(const Matrix& matrix) noexcept {
 
     for (int y = 0; y < matrix.height; y++) {
         for (int x = 0; x < matrix.width; x++) {
-            image[y][x] = matrix[y][x];
+            image[y][x] = static_cast<uint8_t>(matrix[y][x]);
         }
     }
 
