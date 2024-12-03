@@ -70,6 +70,7 @@ struct Matrix : std::vector<std::vector<double>>
 {
     int width, height;
     Matrix(int height, int width) noexcept;
+    Matrix(int height, int width, double value) noexcept;
     Matrix(std::initializer_list<std::initializer_list<double>> list);
     Matrix operator-() const noexcept;          // Component-wise negation
     Matrix operator+(const Matrix& other) const;
@@ -130,6 +131,7 @@ Matrix::Matrix(int height, int width) noexcept : std::vector<std::vector<double>
 Matrix::Matrix(std::initializer_list<std::initializer_list<double>> list) : std::vector<std::vector<double>>(list.size(), std::vector<double>(list.begin()->size())), width(list.begin()->size()), height(list.size()) {
     std::copy(list.begin(), list.end(), begin());
 }
+Matrix::Matrix(int height, int width, double value) noexcept : std::vector<std::vector<double>>(height, std::vector<double>(width, value)), height(height), width(width) {}
 
 Matrix Matrix::operator*(const Matrix& other) const {
     if (width != other.height)
@@ -403,7 +405,7 @@ GrayImage GrayImage::fromMatrix(const Matrix& matrix) noexcept {
 
     for (int y = 0; y < matrix.height; y++) {
         for (int x = 0; x < matrix.width; x++) {
-            image[y][x] = matrix[y][x];
+            image[y][x] = static_cast<uint8_t>(matrix[y][x]);
         }
     }
 
