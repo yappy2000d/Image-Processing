@@ -2,21 +2,23 @@ cmake_minimum_required(VERSION 3.10)
 
 project(ImgProcLib VERSION 1.0.1 DESCRIPTION "A lightweight C++ library you need for image processing")
 
-set(CMAKE_BUILD_TYPE Release)
+# 設定 package 的標頭檔目錄
+set(PACKAGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# 安裝庫和 CMake 配置文件
-install(TARGETS ImgProc EXPORT ImgProcTargets
-        ARCHIVE DESTINATION lib
-        INCLUDES DESTINATION include)
+# 設定 package 的來源檔案
+set(PACKAGE_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ImgProc.cpp
+)
 
-install(EXPORT ImgProcTargets
-        FILE ImgProcConfig.cmake
-        DESTINATION lib/cmake/ImgProc)
+# 建立靜態連結庫
+add_library(Image-Processing STATIC ${PACKAGE_SOURCES})
 
-install(FILES include/ImgProc.h
-        DESTINATION include)
+# 指定標頭檔目錄
+target_include_directories(Image-Processing PUBLIC ${PACKAGE_INCLUDE_DIR})
 
-# 包含目錄
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+# 安裝靜態庫
+install(TARGETS Image-Processing
+        ARCHIVE DESTINATION lib)
 
-add_library(ImgProc STATIC src/ImgProc.cpp)
+# 安裝標頭檔
+install(FILES ${PACKAGE_INCLUDE_DIR}/ImgProc.h DESTINATION include)
