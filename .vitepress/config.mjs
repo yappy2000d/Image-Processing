@@ -12,7 +12,7 @@ export default defineConfig({
       { text: "Docs", link: "/pages/setup" },
       {
         text: "Examples",
-        link: "https://github.com/yappy2000d/Image-Processsing/tree/main/example",
+        link: "https://github.com/yappy2000d/Image-Processing-Implementation",
       },
     ],
 
